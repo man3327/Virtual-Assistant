@@ -1,6 +1,8 @@
 import React from "react";
 import bg from "../assets/misaBg.jpg";
 import { IoMdEye } from "react-icons/io";
+//import { IoMdEyeOff } from "react-icons/io";
+//<IoMdEyeOff />
 function SignUp() {
   return (
     <div className='w-full h-[100vh] bg-cover flex items-center justify-center' style={{backgroundImage: `url(${bg})`}}>
