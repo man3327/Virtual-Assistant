@@ -9,18 +9,36 @@ function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const { serverUrl } = useContext(UserDataContext);
   const navigate = useNavigate();
-  const [name,setName] = useState("");
-  const [email,setEmail] = useState("");
-  const [password,setPassword] = useState("");
-  const handleSignUp = async (e)=>{
-    e.preventDefault()
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [loading,setLoading] = useState(false);
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    if (!name || !email || !password) {
+      setError("Please fill in all fields.");
+      return;
+    }
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long.");
+      return;
+    }
     try {
-      let result = await axios.post(`${serverUrl}/api/auth/signup`, { 
-        name, email, password
-       },{withCredentials:true});
+      const result = await axios.post(
+        `${serverUrl}/api/auth/signup`,
+        { name, email, password },
+        { withCredentials: true }
+      );
       console.log(result);
+      setLoading(false);
+      navigate("/signin");
     } catch (error) {
-      console.log(error);
+      console.log(error.response?.data || error.message || error);
+      setLoading(false);
+      setError(error.response?.data?.message || "Signup failed. Please try again.");
     }
   }
   return (
@@ -34,8 +52,9 @@ function SignUp() {
         {!showPassword && <IoMdEye className='absolute top-[18px] right-[20px] w-[25px] h-[25px] text-[white] cursor-pointer'  onClick={() => setShowPassword(true)}/>}
         {showPassword && <IoMdEyeOff className='absolute top-[18px] right-[20px] w-[25px] h-[25px] text-[white] cursor-pointer'  onClick={() => setShowPassword(false)}/>}
         </div>
-        <button className='min-w-[150px] h-[60px] mt-[30px] text-black font-semibold bg-white rounded-full hover:bg-blue-600 transition-colors duration-300'>
-          Sign Up
+        {error && <p className='text-red-400 text-[17px] text-center w-full'>*{error}</p>}
+        <button className='min-w-[150px] h-[60px] mt-[30px] text-black font-semibold bg-white rounded-full hover:bg-blue-600 transition-colors duration-300 disabled={loading}'>
+          {loading ? "Loading..." : "Sign Up"}
         </button>
         <p className='text-white text-[18px] cursor-pointer' onClick={() => navigate("/signin")}>
           Already have an account? <span className='text-blue-400 cursor-pointer hover:underline'>Sign In</span>
